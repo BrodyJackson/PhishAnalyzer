@@ -7,8 +7,34 @@
 <h2>Create</h2>
 
 <h4>Message</h4>
+
+
 <hr />
+@*need to ensure that there is validation on FileName. Also need to add verification that it is only .md files *@
 <div class="row">
+    <div class="col-md-4"
+        <form method="post" enctype="multipart/form-data" asp-controller="MessagesController" asp-action="UploadFiles">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <div class="col-md-10">
+                    <p>Upload one or more files using this form:</p>
+                    <input class="btn btn-default" type="file" name="files" multiple />
+                    <span asp-validation-for="sender" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-10">
+                    <input type="submit" value="Create" class="btn btn-default" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<hr />
+<hr />
+
+@*<div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -37,7 +63,7 @@
             </div>
         </form>
     </div>
-</div>
+</div>*@
 
 <div>
     <a asp-action="Index">Back to List</a>

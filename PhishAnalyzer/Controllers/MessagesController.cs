@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using MsgReader.Outlook;
 using PhishAnalyzer.Data;
 using PhishAnalyzer.Models;
 
@@ -52,17 +55,41 @@ namespace PhishAnalyzer.Controllers
         // POST: Messages/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost("UploadFiles")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,sender,subject,body,recieved")] Message message)
+        public async Task<IActionResult> UploadFiles(List<IFormFile> files) 
+            //Create([Bind("ID,sender,subject,body,recieved")] Message message)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(message);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(message);
+            var filePath = Path.GetTempFileName();
+            Random rnd = new Random(); 
+            foreach (var formFile in files)
+                if (formFile.Length > 0)
+                {
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await formFile.CopyToAsync(stream);
+                    }
+                    using (var msg = new MsgReader.Outlook.Storage.Message(filePath))
+                    {
+                        int id = rnd.Next(); 
+                        var from = msg.GetEmailSender(false, false);
+                        var sentOn = msg.SentOn;
+                        var sentTo = msg.GetEmailRecipients(Storage.Recipient.RecipientType.To, false, false); 
+                        var sentTocc = msg.GetEmailRecipients(Storage.Recipient.RecipientType.Cc, false, false);
+                        var subject = msg.Subject;
+                        var htmlBody = msg.BodyHtml;
+                        var email = new Message(id, from, sentOn, sentTo, sentTocc, subject, htmlBody);
+                        Console.WriteLine(email);
+
+                        if (ModelState.IsValid)
+                        {
+                            _context.Add(email);
+                            await _context.SaveChangesAsync();
+                        }
+                    }                
+                }
+            return RedirectToAction(nameof(Index));
+            /*return View(message)*/;
         }
 
         // GET: Messages/Edit/5
