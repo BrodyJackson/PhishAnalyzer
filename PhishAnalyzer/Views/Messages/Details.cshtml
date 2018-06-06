@@ -17,16 +17,22 @@
             @Html.DisplayFor(model => model.sender)
         </dd>
         <dt>
+            @Html.DisplayNameFor(model => model.recipient)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.recipient)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.recipientCC)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.recipientCC)
+        </dd>
+        <dt>
             @Html.DisplayNameFor(model => model.subject)
         </dt>
         <dd>
             @Html.DisplayFor(model => model.subject)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.body)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.body)
         </dd>
         <dt>
             @Html.DisplayNameFor(model => model.recieved)
@@ -34,6 +40,13 @@
         <dd>
             @Html.DisplayFor(model => model.recieved)
         </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.body)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.body)
+        </dd>
+
     </dl>
 </div>
 <div>

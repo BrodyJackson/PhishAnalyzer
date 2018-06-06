@@ -55,9 +55,8 @@ namespace PhishAnalyzer.Controllers
         // POST: Messages/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost("UploadFiles")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UploadFiles(List<IFormFile> files) 
+        [HttpPost]
+        public async Task<IActionResult> FileUpload(List<IFormFile> files) 
             //Create([Bind("ID,sender,subject,body,recieved")] Message message)
         {
             var filePath = Path.GetTempFileName();
@@ -71,20 +70,21 @@ namespace PhishAnalyzer.Controllers
                     }
                     using (var msg = new MsgReader.Outlook.Storage.Message(filePath))
                     {
-                        int id = rnd.Next(); 
+                        //int id = rnd.Next(); 
                         var from = msg.GetEmailSender(false, false);
                         var sentOn = msg.SentOn;
                         var sentTo = msg.GetEmailRecipients(Storage.Recipient.RecipientType.To, false, false); 
                         var sentTocc = msg.GetEmailRecipients(Storage.Recipient.RecipientType.Cc, false, false);
                         var subject = msg.Subject;
                         var htmlBody = msg.BodyHtml;
-                        var email = new Message(id, from, sentOn, sentTo, sentTocc, subject, htmlBody);
+                        var email = new Message(/*id,*/ from, sentOn, sentTo, sentTocc, subject, htmlBody);
                         Console.WriteLine(email);
 
                         if (ModelState.IsValid)
                         {
                             _context.Add(email);
                             await _context.SaveChangesAsync();
+                            Console.WriteLine("context chanhed to add msg details");
                         }
                     }                
                 }

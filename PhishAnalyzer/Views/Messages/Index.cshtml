@@ -4,7 +4,7 @@
     ViewData["Title"] = "Index";
 }
 
-<h2>Index</h2>
+<h2>Messages</h2>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -12,18 +12,25 @@
 <table class="table">
     <thead>
         <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.sender)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.subject)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.body)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.recieved)
-                </th>
+            <th>
+                @Html.DisplayNameFor(model => model.sender)
+            </th>
+            <td>
+                @Html.DisplayNameFor(model => model.recipient)
+            </td>
+            <td>
+                @Html.DisplayNameFor(model => model.recipientCC)
+            </td>
+            <th>
+                @Html.DisplayNameFor(model => model.subject)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.recieved)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.body)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -34,13 +41,21 @@
                 @Html.DisplayFor(modelItem => item.sender)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.recipient)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.recipientCC)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.subject)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.body)
+                @Html.DisplayFor(modelItem => item.recieved)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.recieved)
+                <div class="scrollBody">
+                    @Html.DisplayFor(modelItem => item.body)
+                </div>
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |

@@ -20,9 +20,9 @@ namespace PhishAnalyzer.Models
         {
 
         }
-        public Message(int id, string from, DateTime? sentOn, string sentTo, string sentTocc, string subject, string htmlBody)
+        public Message(/*int id,*/ string from, DateTime? sentOn, string sentTo, string sentTocc, string subject, string htmlBody)
         {
-            ID = id;
+            //ID = id;
             this.sender = from;
             this.recieved = sentOn;
             this.recipient = sentTo;
