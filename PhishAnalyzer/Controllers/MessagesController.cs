@@ -78,11 +78,15 @@ namespace PhishAnalyzer.Controllers
                         var sentTo = msg.GetEmailRecipients(Storage.Recipient.RecipientType.To, false, false); 
                         var sentTocc = msg.GetEmailRecipients(Storage.Recipient.RecipientType.Cc, false, false);
                         var subject = msg.Subject;
-                        var htmlBody = msg.BodyHtml;
-                        var headers = msg.Headers.ToString();
+                        var htmlBody = msg.BodyText; //can change to bodyHTLM is want that instead
+                        var headerSender = msg.Headers.From.Address;
+                        var headerSenderValid = msg.Headers.From.HasValidMailAddress; 
+                        Console.Write("test");  
                         var senderDomain = from.Split("@")[1];
-                        var senderIP = msg.Headers.Received.Last().ToString(); 
-                        var email = new Message(/*id,*/ from, sentOn, sentTo, sentTocc, subject, htmlBody, headers, senderDomain, senderIP);
+
+                        //IP below is not currently sent in to the model, can easily change if needed
+                        //var senderIP = msg.Headers.Received.Last().Names[0]; 
+                        var email = new Message(/*id,*/ from, sentOn, sentTo, sentTocc, subject, htmlBody, headerSender, senderDomain, headerSenderValid);
                         Console.WriteLine(email);
 
                         if (ModelState.IsValid)

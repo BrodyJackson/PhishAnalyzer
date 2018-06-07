@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Helpers;
+using MsgReader.Mime.Header;
 using MsgReader.Outlook;
 using Org.Mentalis.Utilities; 
 
@@ -19,19 +20,19 @@ namespace PhishAnalyzer.Models
         public string recipientCC { get; set; }
         public string subject { get; set; }
         public string body { get; set; }
-        public string headers { get; set; }
+        public string headerSender { get; set; }
         public string senderDomain { get; set; }
         //risk not yet added to db model
         public string riskRating { get; set; }
         //mx not yet added to db model
         public string mxRecords { get; set; }
         public string senderDomainRegDate { get; set; }
-        public string senderIP { get; set; }
+        public bool headerSenderValid { get; set; }
         public Message()
         {
 
         }
-        public Message(/*int id,*/ string from, DateTime? sentOn, string sentTo, string sentTocc, string subject, string htmlBody, string headers, string senderDomain, string senderIP)
+        public Message(/*int id,*/ string from, DateTime? sentOn, string sentTo, string sentTocc, string subject, string htmlBody, string headerSender, string senderDomain, bool headerSenderValid)
         {
             //ID = id;
             this.sender = from;
@@ -40,12 +41,12 @@ namespace PhishAnalyzer.Models
             this.recipientCC = sentTocc;
             this.subject = subject;
             this.body = htmlBody;
-            this.headers = headers;
+            this.headerSender = headerSender;
             this.senderDomain = senderDomain;
-            this.mxRecords = Find_MX_records(senderDomain);
-            this.senderDomainRegDate = Find_domaion_creation_date(senderDomain);
-            this.senderIP = senderIP;
-            this.riskRating = getRiskRating(); 
+            this.mxRecords = "Mx Records will go here when there is network access"; //Find_MX_records(senderDomain); //add this in after the rest works
+            this.senderDomainRegDate = "registration date will go here when there is network access"; //Find_domaion_creation_date(senderDomain);
+            this.headerSenderValid = headerSenderValid; 
+            this.riskRating = "XXXXX";  //getRiskRating(); will be uncommented when network access is provided hardcoded for now 
         }
 
         public string getRiskRating()
@@ -84,7 +85,7 @@ namespace PhishAnalyzer.Models
             if (difference.Days < 8) rating += "X";
 
             //potentail forged IP sender
-            if (this.senderIP.Contains("(may be forged)")) rating += "X";
+            //if (this.senderIP.Contains("(may be forged)")) rating += "X";
 
             //Check for spelling errors within th body of email
 
