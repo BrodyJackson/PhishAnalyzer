@@ -60,6 +60,7 @@ namespace PhishAnalyzer.Controllers
             //Create([Bind("ID,sender,subject,body,recieved")] Message message)
         {
             var filePath = Path.GetTempFileName();
+            //rand probably not needed here, can delete when done
             Random rnd = new Random(); 
             foreach (var formFile in files)
                 if (formFile.Length > 0)
@@ -71,13 +72,17 @@ namespace PhishAnalyzer.Controllers
                     using (var msg = new MsgReader.Outlook.Storage.Message(filePath))
                     {
                         //int id = rnd.Next(); 
+                
                         var from = msg.GetEmailSender(false, false);
                         var sentOn = msg.SentOn;
                         var sentTo = msg.GetEmailRecipients(Storage.Recipient.RecipientType.To, false, false); 
                         var sentTocc = msg.GetEmailRecipients(Storage.Recipient.RecipientType.Cc, false, false);
                         var subject = msg.Subject;
                         var htmlBody = msg.BodyHtml;
-                        var email = new Message(/*id,*/ from, sentOn, sentTo, sentTocc, subject, htmlBody);
+                        var headers = msg.Headers.ToString();
+                        var senderDomain = from.Split("@")[1];
+                        var senderIP = msg.Headers.Received.Last().ToString(); 
+                        var email = new Message(/*id,*/ from, sentOn, sentTo, sentTocc, subject, htmlBody, headers, senderDomain, senderIP);
                         Console.WriteLine(email);
 
                         if (ModelState.IsValid)
@@ -93,7 +98,7 @@ namespace PhishAnalyzer.Controllers
         }
 
         // GET: Messages/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Analyze(int? id)
         {
             if (id == null)
             {
@@ -113,7 +118,7 @@ namespace PhishAnalyzer.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,sender,subject,body,recieved")] Message message)
+        public async Task<IActionResult> Analyze(int id, [Bind("ID,sender,subject,body,recieved")] Message message)
         {
             if (id != message.ID)
             {
