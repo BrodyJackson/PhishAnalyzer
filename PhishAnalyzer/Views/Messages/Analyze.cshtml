@@ -1,54 +1,88 @@
-﻿@model PhishAnalyzer.Models.Message
+﻿@using System.Text.RegularExpressions
+@model PhishAnalyzer.Models.Message
 
 @{
     ViewData["Title"] = "Analyze";
+    List<string> urls = new List<string>();
 }
 
-<h2>Analyze</h2>
+@functions{
+    public string createUrlList(string body)
+    {
+        string returnString = "";
+        foreach (Match item in Regex.Matches(Model.body, @"(http|ftp|https):\/\/([\w\-_]+(?:(?:\.[\w\-_]+)+))([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?"))
+        {
+            returnString = returnString + "<div class='col-md-12'> <pre id='pre-override'>" + item.Value + "</pre></div>";
+        }
+        returnString = "<div class='row'>" + returnString + "</div>";
+        return returnString;
+    }
+    //here will be the methods used for calcualating the risk for each url, need to figure out the data pathway for this, and how it will all work. This is just fleshed out
+    public string getVirusTotal(string url)
+    {
+        string test = ApiMethods.findVirusTotalInfo(url);
+        return "";
+    }
+}
 
-<h4>Message</h4>
+<h1>Message Analysis</h1>
 <hr />
+<h3>Details</h3>
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Analyze">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ID" />
-            <div class="form-group">
-                <label asp-for="sender" class="control-label"></label>
-                <input asp-for="sender" class="form-control" />
-                <span asp-validation-for="sender" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="recipient" class="control-label"></label>
-                <input asp-for="recipient" class="form-control" />
-                <span asp-validation-for="recipient" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="recipientCC" class="control-label"></label>
-                <input asp-for="recipientCC" class="form-control" />
-                <span asp-validation-for="recipientCC" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="subject" class="control-label"></label>
-                <input asp-for="subject" class="form-control" />
-                <span asp-validation-for="subject" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="recieved" class="control-label"></label>
-                <input asp-for="recieved" class="form-control" />
-                <span asp-validation-for="recieved" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="body" class="control-label"></label>
-                <input asp-for="body" class="form-control" />
-                <span asp-validation-for="body" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
-            </div>
-        </form>
+    <div class="col-md-6">
+        <div class="form-group">
+            <h4>Sender</h4>
+            <pre> @Model.sender </pre>
+        </div>
+        <div class="form-group">
+            <h4>Recipient</h4>
+            <pre id="pre-override"> @Model.recipient </pre>
+        </div>
+        <div class="form-group">
+            <h4>Recieved On</h4>
+            <pre> @Model.recieved </pre>
+        </div>
+
+        <div class="form-group">
+            <h4>Sender Domain</h4>
+            <pre> @Model.senderDomain</pre>
+        </div>
+        <div class="form-group">
+            <h4>MX Records</h4>
+            <pre> @Model.mxRecords </pre>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="form-group">
+            <h4>Actual Sender</h4>
+            <pre> @Model.headerSender </pre>
+        </div>
+        <div class="form-group">
+            <h4>Recipient CC'd</h4>
+            <pre> @Model.recipientCC </pre>
+        </div>
+        <div class="form-group">
+            <h4>Subject</h4>
+            <pre> @Model.subject </pre>
+        </div>
+        <div class="form-group">
+            <h4>Domain Register Date</h4>
+            <pre> @Model.senderDomainRegDate </pre>
+        </div>
     </div>
 </div>
+<div class="row">
+    <div class="col-md-12">
+        <h4>Message Body</h4>
+        <pre id="pre-override" style="max-height: 300px;"> @Model.body </pre>
+    </div>
+</div>
+
+<hr />
+
+<h3>URL's Found In Body</h3>
+@Html.Raw(@createUrlList(Model.body))  @*call the function which creates the url html tags*@
 
 <div>
     <a asp-action="Index">Back to List</a>
