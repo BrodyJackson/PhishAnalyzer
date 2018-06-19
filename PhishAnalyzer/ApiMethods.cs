@@ -11,8 +11,9 @@ namespace PhishAnalyzer
 {
     public class ApiMethods
     {
-        public static async Task<string> findVirusTotalInfoAsync(string url)
+        public static async Task<string> FindVirusTotalInfoAsync(string url)
         {
+            string returnString = ""; 
             VirusTotal virusTotal = new VirusTotal("de0a5c113302967ab7d535c84e8a6ce49eacbd2952397c43dc99c13a26df423e");
             virusTotal.UseTLS = true;
             UrlReport urlReport = await virusTotal.GetUrlReportAsync(url);
@@ -31,7 +32,8 @@ namespace PhishAnalyzer
                 UrlScanResult urlResult = await virusTotal.ScanUrlAsync(url);
                 PrintScan(urlResult);
             }
-            return "";
+            returnString = returnString + urlReport.Permalink + "***" + urlReport.Positives + "/" + urlReport.Total;  
+            return returnString;
             //repeat varius api interaction methods for the other analysis sites with each irl 
         }
         private static void PrintScan(UrlScanResult scanResult)
