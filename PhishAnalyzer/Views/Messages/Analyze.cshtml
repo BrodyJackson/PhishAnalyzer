@@ -7,20 +7,41 @@
 }
 
 @functions{
+
+
     public string createUrlList(string body)
     {
         string returnString = "";
+        string returnDecodedString = ""; 
         foreach (Match item in Regex.Matches(Model.body, @"(http|ftp|https):\/\/([\w\-_]+(?:(?:\.[\w\-_]+)+))([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?"))
         {
+
             returnString = returnString + "<div class='col-md-12'> <pre id='pre-override'>" + item.Value + "</pre></div>";
+
+            if (item.Value.Contains("urldefense.proofpoint"))
+            {
+                //parsing taken directly from the targeted attack website which decides the URL's
+                var beginning = item.Value.IndexOf("l?u=") + 4;
+                var end = item.Value.IndexOf("&d=");
+                var URL2 = item.Value.Substring(beginning, end);
+                var final = URL2.Replace("-3A", ":").Replace("_", "/").Replace("-7E", "~").Replace("-2560", "`").Replace("-21", "!").Replace("-40", "@").Replace("-23", "#");
+                var final2 = final.Replace("-24", "$").Replace("-25", "%").Replace("-255E", "^").Replace("-26", "&").Replace("-2A", "*").Replace("-28", "(").Replace("-29", ")");
+                var final3 = final2.Replace("-5F", "_").Replace("-2B", "+").Replace("-2D", "-").Replace("-3D", "=").Replace("-257B", "{").Replace("257D", "}").Replace("-257C", "|");
+                var final4 = final3.Replace("-5B", "[").Replace("-5D", "]").Replace("-255C", "\\").Replace("-26quot-3B", "\"").Replace("-3B", ";").Replace("-26-2339-3B", "'").Replace("-26lt-3B", "<");
+                //var final5 = final4.Replace("/-26gt-3B/g", ">").Replace("/-3F/g", "?").Replace("/-2C/g", ",");
+                returnDecodedString = returnDecodedString + "<div class='col-md-12'> <pre id='pre-override'>" + final4 + "</pre></div>";
+
+            }
+
+            getVirusTotal(item.Value); //this will not be here, just here right now to test the api calls
         }
-        returnString = "<div class='row'>" + returnString + "</div>";
+        returnString = "<div class='row'>" + returnString + "</div>" + "<h3>Decoded Proofpoint URL's</h3>" + "<div class='row'>" + returnDecodedString + "</div>";
         return returnString;
     }
     //here will be the methods used for calcualating the risk for each url, need to figure out the data pathway for this, and how it will all work. This is just fleshed out
     public string getVirusTotal(string url)
     {
-        string test = ApiMethods.findVirusTotalInfo(url);
+        Task<String> test = ApiMethods.findVirusTotalInfoAsync(url);
         return "";
     }
 }
