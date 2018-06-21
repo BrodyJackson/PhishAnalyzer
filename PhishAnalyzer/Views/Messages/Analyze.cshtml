@@ -10,7 +10,7 @@
 @functions{
 
     Task<String> virusTotalResults;
-    List<string> vtScanStrings = new List<string>;
+    List<string> vtScanStrings = new List<string>();
 
     public string getVirusTotal()
     {
@@ -19,18 +19,23 @@
 
         foreach (string Scan in vtScanStrings)
         {
-            returnString = returnString + "<H6>Scan" + counter;
+            returnString = returnString + "<div class='col-md-12'>" + "<H3>Scan" + counter + "</h3><pre>";
             string[] scanSplit = Scan.Split("***");
-            returnString = returnString + "Detections = " + scanSplit[1];
-            if ( !scanSplit[1].Contains("0/") )
+            if (scanSplit[1].Contains("-1"))
             {
-                returnString = returnString + "Note that any positive results are strong indications of malicious URL";
-
+                return  "<div class='row'><div class='col-md-12'>" + "<pre><p>You have exceeded your VirusTotal API calls, please wait a minute and try again</p></pre></div></div>";
+            }
+            else if (!scanSplit[1].Contains("0/"))
+            {
+                returnString = returnString + "<p class='bg-danger'>Note that any positive results are strong indications of malicious URL </p>";
             }
 
+            returnString = returnString + "<p>Detections = " + scanSplit[1] + "</p>";
+            returnString = returnString + "<p>The full scan report can be found " + "<a href='" + scanSplit[0] + "'>Here</a></p></div>";
+            counter++;
         }
-
-        return returnString;
+        vtScanStrings.Clear(); 
+        return returnString + "</pre></div>";
     }
     //create the html tags for the url's found in the message, as well as the url's for the decoded url's. Also makes calls to the virus total scans and stores the results in a list
     public string createUrlList(string body)
@@ -53,15 +58,24 @@
                 var final4 = final3.Replace("-5B", "[").Replace("-5D", "]").Replace("-255C", "\\").Replace("-26quot-3B", "\"").Replace("-3B", ";").Replace("-26-2339-3B", "'").Replace("-26lt-3B", "<");
                 //var final5 = final4.Replace("/-26gt-3B/g", ">").Replace("/-3F/g", "?").Replace("/-2C/g", ",");
                 returnDecodedString = returnDecodedString + "<div class='col-md-12'> <pre id='pre-override'>" + final4 + "</pre></div>";
-
-                virusTotalResults =  ApiMethods.FindVirusTotalInfoAsync(final4);
-                virusTotalResults.Wait();
-                vtScanStrings.Add(virusTotalResults.Result);
+                try{
+                    virusTotalResults = ApiMethods.FindVirusTotalInfoAsync(final4);
+                    virusTotalResults.Wait();
+                    vtScanStrings.Add(virusTotalResults.Result);
+                }
+                catch (Exception) {
+                    vtScanStrings.Add("0***-1");
+                }
             }
             else {
-                virusTotalResults = ApiMethods.FindVirusTotalInfoAsync(item.Value);
-                virusTotalResults.Wait();
-                vtScanStrings.Add(virusTotalResults.Result);
+                try{
+                    virusTotalResults = ApiMethods.FindVirusTotalInfoAsync(item.Value);
+                    virusTotalResults.Wait();
+                    vtScanStrings.Add(virusTotalResults.Result);
+                }
+                catch (Exception){
+                    vtScanStrings.Add("0***-1");
+                }
             }
         }
         returnString = "<div class='row'>" + returnString + "</div>" + "<h3>Decoded Proofpoint URL's</h3>" + "<div class='row'>" + returnDecodedString + "</div>";
