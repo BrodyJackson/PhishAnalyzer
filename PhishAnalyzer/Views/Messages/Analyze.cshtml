@@ -1,4 +1,7 @@
 ﻿@using System.Text.RegularExpressions
+@using RestSharp; 
+@using RestSharp.Authenticators; 
+@using PhishAnalyzer.Helpers; 
 @model PhishAnalyzer.Models.Message
 
 @{
@@ -34,9 +37,22 @@
             returnString = returnString + "<p>The full scan report can be found " + "<a href='" + scanSplit[0] + "'>Here</a></p></div>";
             counter++;
         }
-        vtScanStrings.Clear(); 
+        vtScanStrings.Clear();
         return returnString + "</pre></div>";
     }
+
+    public string test()
+    {
+        GetScreenshot.GetScreenshotStart();
+        //var client = new RestClient("https://api.screenshotapi.io/capture");
+        //var request = new RestRequest(Method.POST);
+        ////       request.AddHeader("access_key", "dd37780fd2b27e5ebe2d86e3af60159a");
+        ////request.AddParameter("undefined", "url=http://google.com", ParameterType.RequestBody);
+        //IRestResponse response = client.Execute(request);
+        //Console.Write(response);
+        return " ";
+    }
+
     //create the html tags for the url's found in the message, as well as the url's for the decoded url's. Also makes calls to the virus total scans and stores the results in a list
     public string createUrlList(string body)
     {
@@ -146,6 +162,7 @@
 
 <h3> Virus Total Scan Results</h3>
 @Html.Raw(@getVirusTotal())
+@test()
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
