@@ -6,7 +6,7 @@
 
 @{
     ViewData["Title"] = "Analyze";
-    List<string> urls = new List<string>();
+    
     
 }
 
@@ -14,6 +14,7 @@
 
     Task<String> virusTotalResults;
     List<string> vtScanStrings = new List<string>();
+    List<string> urls = new List<string>();
 
     public string getVirusTotal()
     {
@@ -41,16 +42,22 @@
         return returnString + "</pre></div>";
     }
 
-    public string test()
+    public string Screenshots()
     {
-        GetScreenshot.GetScreenshotStart();
-        //var client = new RestClient("https://api.screenshotapi.io/capture");
-        //var request = new RestRequest(Method.POST);
-        ////       request.AddHeader("access_key", "dd37780fd2b27e5ebe2d86e3af60159a");
-        ////request.AddParameter("undefined", "url=http://google.com", ParameterType.RequestBody);
-        //IRestResponse response = client.Execute(request);
-        //Console.Write(response);
-        return " ";
+        string returnString = "<div class='row'>";
+        int counter = 0;
+        foreach (string url in urls){
+            string path = "../../images/" + counter + ".png";
+            GetScreenshot.GetScreenshotStart(url, counter); //the counter is used to name the screenshot in the GetScreenshot class
+            returnString = returnString + "<a href='" + path + "'" + " data-toggle='lightbox' data-gallery='example-gallery' class='col-sm-4'>";
+            returnString = returnString + "<img src='" + path + "'" + " class='img-fluid'></a>";
+            counter++;
+            if (counter == 3) break; 
+        }
+        urls.Clear(); 
+
+
+        return returnString + "</div >";
     }
 
     //create the html tags for the url's found in the message, as well as the url's for the decoded url's. Also makes calls to the virus total scans and stores the results in a list
@@ -72,7 +79,8 @@
                 var final2 = final.Replace("-24", "$").Replace("-25", "%").Replace("-255E", "^").Replace("-26", "&").Replace("-2A", "*").Replace("-28", "(").Replace("-29", ")");
                 var final3 = final2.Replace("-5F", "_").Replace("-2B", "+").Replace("-2D", "-").Replace("-3D", "=").Replace("-257B", "{").Replace("257D", "}").Replace("-257C", "|");
                 var final4 = final3.Replace("-5B", "[").Replace("-5D", "]").Replace("-255C", "\\").Replace("-26quot-3B", "\"").Replace("-3B", ";").Replace("-26-2339-3B", "'").Replace("-26lt-3B", "<");
-                //var final5 = final4.Replace("/-26gt-3B/g", ">").Replace("/-3F/g", "?").Replace("/-2C/g", ",");
+                //var final5 = final4.Replace("/-26gt-3B/g", ">").Replace("/-3F/g", "?").Replace("/-2C/g", ","); 
+                urls.Add(final4);
                 returnDecodedString = returnDecodedString + "<div class='col-md-12'> <pre id='pre-override'>" + final4 + "</pre></div>";
                 try{
                     virusTotalResults = ApiMethods.FindVirusTotalInfoAsync(final4);
@@ -86,6 +94,7 @@
             else {
                 try{
                     virusTotalResults = ApiMethods.FindVirusTotalInfoAsync(item.Value);
+                    urls.Add(item.Value);
                     virusTotalResults.Wait();
                     vtScanStrings.Add(virusTotalResults.Result);
                 }
@@ -162,7 +171,12 @@
 
 <h3> Virus Total Scan Results</h3>
 @Html.Raw(@getVirusTotal())
-@test()
+<h3> Screenshots</h3>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        @Html.Raw(@Screenshots())
+    </div>
+</div>
 <div>
     <a asp-action="Index">Back to List</a>
 </div>

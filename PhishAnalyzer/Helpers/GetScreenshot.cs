@@ -12,9 +12,9 @@ namespace PhishAnalyzer.Helpers
     {
          
 
-        public static void GetScreenshotStart()
+        public static void GetScreenshotStart( String url, int counter)
         {
-            var beginCaptureTask = BeginCapture("www.amazon.com", "1200x800", "true", "firefox", "true");
+            var beginCaptureTask = BeginCapture(url, "1200x800", "true", "firefox", "true");
             string key = beginCaptureTask.Result;
 
             if (key == null)
@@ -22,7 +22,7 @@ namespace PhishAnalyzer.Helpers
                 Console.WriteLine("No Key returned, make sure you specified the correct API_KEY");
                 return;
             }
-            beginCaptureTask = BeginCapture("http://www.amazon.com", "1200x800", "true", "firefox", "true");
+            beginCaptureTask = BeginCapture(url, "1200x800", "true", "firefox", "true");
             key = beginCaptureTask.Result;
             int timeout = 30;
             int tCounter = 0;
@@ -36,7 +36,7 @@ namespace PhishAnalyzer.Helpers
                 if (result.Success)
                 {
                     Console.WriteLine("downloaded screenshot for key: " + key);
-                    File.WriteAllBytes("downloaded_screenshot.png", result.Bytes);
+                    File.WriteAllBytes("wwwroot/images/" +counter+ ".png", result.Bytes);
                     break;
                 }
 
